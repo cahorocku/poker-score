@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家庭扑克积分记录</title>
+    <style>
+        :root {
+            --colors: [
+                #FF6B6B, #4ECDC4, #FFE66D, #6B5B95, #FFA07A, #20B2AA
+            ];
+        }
+        body {
+            font-family: -apple-system, system-ui;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .player {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .player input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        .score {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0 15px;
+        }
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        button:active {
+            opacity: 0.8;
+        }
+        button.reset {
+            background: #FF6B6B;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎴 家庭扑克积分</h1>
+    <div id="players"></div>
+    <div class="controls">
+        <button onclick="resetScores()">重置积分</button>
+    </div>
+
+    <script>
+        // 初始化玩家数据
+        const players = [
+            { name: "玩家1", score: 0, color: "#FF6B6B" },
+            { name: "玩家2", score: 0, color: "#4ECDC4" },
+            { name: "玩家3", score: 0, color: "#FFE66D" },
+            { name: "玩家4", score: 0, color: "#6B5B95" },
+            { name: "玩家5", score: 0, color: "#FFA07A" },
+            { name: "玩家6", score: 0, color: "#20B2AA" }
+        ];
+
+        // 渲染玩家列表
+        function renderPlayers() {
+            const container = document.getElementById("players");
+            container.innerHTML = players.map((player, index) => `
+                <div class="player" style="border-left: 6px solid ${player.color}">
+                    <input type="text" value="${player.name}" 
+                           onchange="updateName(${index}, this.value)">
+                    <button onclick="updateScore(${index}, -1)">-1</button>
+                    <span class="score">${player.score}</span>
+                    <button onclick="updateScore(${index}, 1)">+1</button>
+                </div>
+            `).join("");
+        }
+
+        // 更新玩家名称
+        function updateName(index, newName) {
+            players[index].name = newName;
+            saveToLocalStorage();
+        }
+
+        // 更新玩家积分
+        function updateScore(index, delta) {
+            players[index].score += delta;
+            renderPlayers();
+            saveToLocalStorage();
+
+        }
+
+        // 重置所有积分
+        function resetScores() {
+            if (confirm("确定要重置所有积分吗？")) {
+                players.forEach(p => p.score = 0);
+                renderPlayers();
+                saveToLocalStorage();
+            }
+        }
+
+        // 保存到本地存储
+        function saveToLocalStorage() {
+            localStorage.setItem("pokerScores", JSON.stringify(players));
+        }
+
+        // 加载本地存储
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem("pokerScores");
+            if (savedData) {
+                Object.assign(players, JSON.parse(savedData));
+            }
+        }
+
+        // 初始化
+        loadFromLocalStorage();
+        renderPlayers();
+    </script>
+</body>
+</html>
